@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOLTWISE | Grid Intelligence</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand-box">
+                <div class="brand-mark">V</div>
+                <div>
+                    <h1>VOLTWISE</h1>
+                    <small>Grid Intelligence</small>
+                </div>
+            </div>
+            <nav>
+                <button class="nav-link active" data-target="dashboard">Dashboard</button>
+                <button class="nav-link" data-target="grid">Grid Digital Twin</button>
+                <button class="nav-link" data-target="agents">Agent Command Centre</button>
+                <button class="nav-link" data-target="analytics">Energy Analytics</button>
+                <button class="nav-link" data-target="recovery">Recovery Centre</button>
+                <button class="nav-link" data-target="control">Simulation Control</button>
+                <button class="nav-link" data-target="history">Simulation History</button>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            <section class="page active" id="dashboard">
+                <div class="card-grid top-grid">
+                    <div class="card metric-card">
+                        <label>System Health</label>
+                        <h3 id="system-health">Checking</h3>
+                    </div>
+                    <div class="card metric-card">
+                        <label>Total Demand</label>
+                        <h3 id="total-demand">0 kW</h3>
+                    </div>
+                    <div class="card metric-card">
+                        <label>Available Power</label>
+                        <h3 id="available-power">0 kW</h3>
+                    </div>
+                    <div class="card metric-card">
+                        <label>Battery SOC</label>
+                        <h3 id="battery-soc">0%</h3>
+                    </div>
+                </div>
+                <div class="card-grid two-col">
+                    <div class="card">
+                        <h3>Live System Overview</h3>
+                        <ul id="system-summary" class="summary-list"></ul>
+                    </div>
+                    <div class="card">
+                        <h3>Recent Simulations</h3>
+                        <ul id="recent-simulations" class="summary-list"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="grid">
+                <div class="card">
+                    <h3>Campus Digital Twin</h3>
+                    <svg id="microgrid-svg" viewBox="0 0 900 500" class="grid-svg" aria-label="Campus microgrid diagram">
+                        <rect x="40" y="80" width="120" height="60" fill="#1a2c3d"/>
+                        <text x="100" y="115" text-anchor="middle" fill="#d9f4ff">Main Grid</text>
+                        <rect x="220" y="80" width="160" height="60" fill="#1a2c3d"/>
+                        <text x="300" y="115" text-anchor="middle" fill="#d9f4ff">Solar Panels</text>
+                        <rect x="430" y="80" width="140" height="60" fill="#1a2c3d"/>
+                        <text x="500" y="115" text-anchor="middle" fill="#d9f4ff">Battery</text>
+                        <rect x="610" y="80" width="170" height="60" fill="#1a2c3d"/>
+                        <text x="695" y="115" text-anchor="middle" fill="#d9f4ff">Generator</text>
+                        <rect x="100" y="260" width="120" height="60" fill="#1a2c3d"/>
+                        <text x="160" y="295" text-anchor="middle" fill="#d9f4ff">Library</text>
+                        <rect x="260" y="260" width="140" height="60" fill="#1a2c3d"/>
+                        <text x="330" y="295" text-anchor="middle" fill="#d9f4ff">Academic</text>
+                        <rect x="440" y="260" width="150" height="60" fill="#1a2c3d"/>
+                        <text x="515" y="295" text-anchor="middle" fill="#d9f4ff">Labs</text>
+                        <rect x="630" y="260" width="180" height="60" fill="#1a2c3d"/>
+                        <text x="720" y="295" text-anchor="middle" fill="#d9f4ff">Facilities</text>
+                        <line x1="160" y1="140" x2="220" y2="140" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="380" y1="140" x2="430" y2="140" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="570" y1="140" x2="610" y2="140" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="150" y1="200" x2="150" y2="260" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="330" y1="200" x2="330" y2="260" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="515" y1="200" x2="515" y2="260" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="720" y1="200" x2="720" y2="260" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="140" y1="140" x2="140" y2="200" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="300" y1="140" x2="300" y2="200" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="500" y1="140" x2="500" y2="200" stroke="#4ec7ff" stroke-width="6"/>
+                        <line x1="695" y1="140" x2="695" y2="200" stroke="#4ec7ff" stroke-width="6"/>
+                    </svg>
+                </div>
+            </section>
+
+            <section class="page" id="agents">
+                <div class="card">
+                    <h3>Agent Command Centre</h3>
+                    <div id="agent-logs" class="agent-list"></div>
+                </div>
+            </section>
+
+            <section class="page" id="analytics">
+                <div class="chart-grid">
+                    <div class="card chart-card"><canvas id="demandChart"></canvas></div>
+                    <div class="card chart-card"><canvas id="resourceChart"></canvas></div>
+                    <div class="card chart-card"><canvas id="batteryChart"></canvas></div>
+                    <div class="card chart-card"><canvas id="loadChart"></canvas></div>
+                </div>
+            </section>
+
+            <section class="page" id="recovery">
+                <div id="recovery-cards" class="strategy-grid"></div>
+            </section>
+
+            <section class="page" id="control">
+                <div class="card control-card">
+                    <h3>Simulation Control</h3>
+                    <div class="control-row">
+                        <label>Scenario</label>
+                        <select id="scenario-select"></select>
+                    </div>
+                    <div class="control-row">
+                        <label>Grid Power (kW)</label>
+                        <input id="grid-availability" type="number" value="100" />
+                    </div>
+                    <div class="control-row">
+                        <label>Solar (kW)</label>
+                        <input id="solar-generation" type="number" value="25" />
+                    </div>
+                    <div class="control-row">
+                        <label>Battery SOC (%)</label>
+                        <input id="battery-soc-input" type="number" value="80" />
+                    </div>
+                    <div class="control-row">
+                        <label>Demand Multiplier</label>
+                        <input id="demand-multiplier" type="number" step="0.1" value="1" />
+                    </div>
+                    <div class="control-row">
+                        <label>Generator available</label>
+                        <input id="generator-available" type="checkbox" checked />
+                    </div>
+                    <div class="button-row">
+                        <button id="simulate-btn" class="primary">Run Simulation</button>
+                        <button id="reset-btn">Reset History</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="history">
+                <div class="card">
+                    <h3>Simulation History</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Scenario</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/grid.js"></script>
+    <script src="/static/js/analytics.js"></script>
+    <script src="/static/js/recovery.js"></script>
+</body>
+</html>
