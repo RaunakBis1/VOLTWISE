@@ -10,28 +10,6 @@ VOLTWISE is an autonomous AI grid intelligence and recovery simulation platform 
 - PDF report generation
 - Modern dashboard UI
 
-## Quick start on Windows
-
-```powershell
-cd D:\VOLTWISE
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-python app.py
-```
-
-Open http://127.0.0.1:5000
-
-If PowerShell blocks script execution, run:
-
-```powershell
-cd D:\VOLTWISE
-python -m venv venv
-.\venv\Scripts\python.exe -m pip install --upgrade pip
-.\venv\Scripts\python.exe -m pip install -r requirements.txt
-.\venv\Scripts\python.exe app.py
-```
 
 ## Project structure
 - `agents/` - agent logic
