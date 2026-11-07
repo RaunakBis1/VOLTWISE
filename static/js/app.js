@@ -33,6 +33,19 @@ async function loadScenarios() {
     const select = document.getElementById('scenario-select');
     const options = Object.entries(appState.scenarios).map(([key, value]) => `<option value="${key}">${value.scenario_name}</option>`).join('');
     select.innerHTML = options;
+    select.addEventListener('change', updateScenarioControls);
+    updateScenarioControls();
+}
+
+function updateScenarioControls() {
+    const scenario = appState.scenarios[document.getElementById('scenario-select').value];
+    if (!scenario) return;
+
+    document.getElementById('grid-availability').value = scenario.grid_availability_kw;
+    document.getElementById('solar-generation').value = scenario.solar_generation_kw;
+    document.getElementById('battery-soc-input').value = scenario.battery_soc_percent;
+    document.getElementById('demand-multiplier').value = scenario.demand_multiplier;
+    document.getElementById('generator-available').checked = scenario.generator_available;
 }
 
 async function simulateScenario() {
@@ -105,6 +118,7 @@ async function resetHistory() {
 function renderDashboard(data) {
     const diagnosis = data.diagnosis || {};
     const resource = data.resource_analysis?.resources || {};
+    const recommended = data.recommended_strategy;
     document.getElementById('system-health').textContent = diagnosis.severity || 'Stable';
     document.getElementById('total-demand').textContent = formatNumber(data.initial_demand_kw || 0, 'kW');
     document.getElementById('available-power').textContent = formatNumber(data.available_supply_kw || 0, 'kW');
@@ -112,28 +126,29 @@ function renderDashboard(data) {
     document.getElementById('system-summary').innerHTML = `
         <li>Scenario: ${data.scenario_name}</li>
         <li>Incident: ${diagnosis.incident || 'Normal'}</li>
-        <li>Battery discharge: ${resource.battery_kw || 0} kW</li>
+        <li>Battery discharge: ${recommended?.battery_discharge_kw ?? 0} kW</li>
         <li>Generator: ${resource.generator_kw || 0} kW</li>
     `;
     const recent = document.getElementById('recent-simulations');
-    recent.innerHTML = `<li>Current run: ${data.scenario_name}</li><li>Recommendation: ${data.recommended_strategy?.strategy_name || 'Pending'}</li>`;
+    recent.innerHTML = `<li>Current run: ${data.scenario_name}</li><li>Recommendation: ${data.recommended_strategy?.strategy_name || (data.safety_status === 'unsafe' ? 'No safe strategy' : 'Pending')}</li>`;
 }
 
 function renderAgents(data) {
     const container = document.getElementById('agent-logs');
     const logs = data.logs || [];
+    const summary = value => typeof value === 'string' ? value : JSON.stringify(value);
     container.innerHTML = logs.map(log => `
         <div class="agent-item ${log.status === 'Warning' ? 'warning' : ''}">
             <strong>${log.agent_name}</strong>
             <div>${log.action}</div>
-            <small>${log.output_summary}</small>
+            <small>${summary(log.output_summary)}</small>
         </div>
     `).join('');
 }
 
 function renderGridStatus(data) {
     const svg = document.getElementById('microgrid-svg');
-    const status = data.recommended_strategy ? data.recommended_strategy.validation?.status : 'Valid';
+    const status = data.recommended_strategy?.validation?.status || data.safety_status;
     const color = status === 'Valid' ? '#3ad17a' : '#f5a623';
     svg.querySelectorAll('rect').forEach((rect, idx) => {
         if (idx < 6 || idx === 6) {
@@ -145,9 +160,9 @@ function renderGridStatus(data) {
 function renderRecovery(data) {
     const container = document.getElementById('recovery-cards');
     const strategies = data.strategies || [];
-    const recommended = data.recommended_strategy || strategies[0];
+    const recommended = data.recommended_strategy;
     container.innerHTML = strategies.map(strategy => `
-        <div class="strategy-card ${strategy.strategy_name === recommended.strategy_name ? 'recommended' : ''}">
+        <div class="strategy-card ${recommended && strategy.strategy_name === recommended.strategy_name ? 'recommended' : ''}">
             <h4>${strategy.strategy_name}</h4>
             <ul>
                 <li>Score: ${strategy.score}</li>

@@ -33,11 +33,29 @@ def investigate_incident(scenario):
 
     if deficit > 40:
         severity = "Critical"
-    elif deficit > 0:
+    elif deficit > 0 or incident != "Normal condition with elevated stress":
         severity = "Warning"
     else:
         severity = "Stable"
 
+    affected_resources = {
+        "Complete grid failure": ["grid"],
+        "Solar power collapse": ["solar"],
+        "Battery emergency": ["battery"],
+        "Demand surge": ["loads"],
+    }.get(incident, [])
+    constraints = {
+        "grid_available_kw": float(default_scenario.get("grid_availability_kw", 0)),
+        "solar_available_kw": float(default_scenario.get("solar_generation_kw", 0)),
+        "battery_soc_percent": float(default_scenario.get("battery_soc_percent", 0)),
+        "battery_reserve_percent": float(default_scenario.get("minimum_battery_reserve_percent", 20)),
+        "battery_capacity_kwh": float(default_scenario.get("battery_capacity_kwh", 0)),
+        "battery_max_discharge_kw": float(default_scenario.get("max_battery_discharge_kw", 0)),
+        "generator_available": bool(default_scenario.get("generator_available", False)),
+        "generator_capacity_kw": float(default_scenario.get("generator_capacity_kw", 0)),
+        "interval_minutes": float(default_scenario.get("interval_minutes", 15)),
+        "demand_multiplier": float(default_scenario.get("demand_multiplier", 1)),
+    }
     diagnosis = (
         f"Main grid supply is {default_scenario.get('grid_availability_kw', 0)} kW. "
         f"Available recovery resources provide {supply} kW against a campus demand of {demand} kW. "
@@ -47,10 +65,13 @@ def investigate_incident(scenario):
 
     return {
         "incident": incident,
+        "incident_type": incident,
+        "affected_resources": affected_resources,
         "severity": severity,
         "total_demand_kw": demand,
         "available_supply_kw": supply,
         "deficit_kw": max(0.0, deficit),
+        "constraints": constraints,
         "diagnosis": diagnosis,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }

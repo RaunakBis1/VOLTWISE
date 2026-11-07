@@ -42,7 +42,7 @@ def save_simulation(scenario_name, payload):
             created_at,
             json.dumps(payload, default=str),
             json.dumps({
-                "recommendation": payload.get("recommended_strategy", {}).get("strategy_name"),
+                "recommendation": (payload.get("recommended_strategy") or {}).get("strategy_name"),
                 "status": payload.get("status"),
                 "created_at": created_at,
             }, default=str),

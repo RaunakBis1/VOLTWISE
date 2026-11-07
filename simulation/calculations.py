@@ -74,12 +74,31 @@ def build_resource_snapshot(scenario):
     }
 
 
-def allocate_loads_for_strategy(loads, available_supply_kw, strategy_name):
+def allocate_loads_for_strategy(
+    loads,
+    available_supply_kw,
+    strategy_name,
+    priority_order=None,
+    allocation_proposal=None,
+):
     remaining = float(available_supply_kw)
     allocations = []
-    for load in sorted(loads, key=lambda item: (PRIORITY_ORDER.get(item["priority"], 99), item["demand_kw"])):
+    order = {name: index for index, name in enumerate(priority_order or [])}
+    proposal = {
+        item["id"]: float(item.get("allocated_kw", 0))
+        for item in (allocation_proposal or [])
+    }
+    sorted_loads = sorted(
+        loads,
+        key=lambda item: (
+            order.get(item["name"], len(order) + PRIORITY_ORDER.get(item["priority"], 99)),
+            PRIORITY_ORDER.get(item["priority"], 99),
+            item["demand_kw"],
+        ),
+    )
+    for load in sorted_loads:
         priority = load["priority"]
-        target = load["minimum_kw"]
+        target = max(load["minimum_kw"], proposal.get(load["id"], 0.0))
 
         if strategy_name == "Critical Loads First":
             if priority == "Critical":

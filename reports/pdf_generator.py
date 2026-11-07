@@ -43,7 +43,8 @@ def generate_pdf_report(simulation_data):
     c.setFont("Helvetica-Bold", 12)
     c.drawString(60, 320, "Recommended Strategy")
     c.setFont("Helvetica", 10)
-    recommended = simulation_data.get("recommended_strategy", {})
+    recommended = simulation_data.get("recommended_strategy") or {}
+    c.drawString(60, 230, f"Safety status: {simulation_data.get('safety_status', 'unknown')}")
     c.drawString(60, 300, f"Strategy: {recommended.get('strategy_name', 'Unknown')}")
     c.drawString(60, 285, f"Score: {recommended.get('score', 0)}")
     c.drawString(60, 270, f"Allocated: {recommended.get('allocated_kw', 0)} kW")
